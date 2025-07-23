@@ -1,10 +1,67 @@
-html<>
-     <head>
-        <tittle>My first page<</tittle>
-        <meta keywords="Malla reddy | MRECW"></tittle><meta>
-     </head>
-     <body>
-        <h1>Welcome to MRECW</h1>
-        
-     </body>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Image Classifier</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            body{
+                font-family:Arial,sans-serif;
+                padding: 2rem;
+                background-color: aquamarine;
+            }
+            .container{
+                background: white;
+                padding: 2rem;
+                max-width: 500px;
+                margin: auto;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0 , 0, 1);
+            }
+            button{
+                margin-top: 1rem;
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+            }
+            #result{
+                margin-top: 10.5rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Upload image for classification</h2>
+            <input type="file" id="imageInput"/>
+            <button onclick="uploadImage()">Classify</button>
+            <div id="result"></div>
+        </div>
+        <script>
+            async function uploadImage(){
+                const input = document.getElementById('imageInput');
+                const file = input.files[0];
+                if (!file){
+                    alert("Please select an image.")
+                    return;
+                }
+                const  formData = new FormData();
+                formData.append("file",file);
+                const response = await fetch("/classify/",{
+                    method:"POST",
+                    body: formData
+                });
+                const data = await response.json();
+                const resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = "";
+                if (data.predictions){
+                    resultDiv.innerHTML = "<h3>Predictions</h3><ul>";
+                    for (const label in data.predictions){
+                        const score = (data.predictions[label]*100).toFixed(2);
+                        resultDiv.innerHTML += '<li><strong>${label}</string>:${score}%</li>';
+                    }
+                    resultDiv.innerHTML += "</ul>";
+                }else{
+                    resultDiv.innerHTML = '<p style="color:red;">Error:${data.error}</p>';
+                }
+            }
+        </script>
+    </body>
 </html>
